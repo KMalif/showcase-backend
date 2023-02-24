@@ -1,5 +1,7 @@
 package com.plugin.showcaserestfullapi.service.impl
 
+import com.cloudinary.utils.ObjectUtils
+import com.plugin.showcaserestfullapi.config.CloudinaryConfig
 import com.plugin.showcaserestfullapi.entity.Showcase
 import com.plugin.showcaserestfullapi.helper.NotFoundException
 import com.plugin.showcaserestfullapi.helper.ValidationUtil
@@ -18,11 +20,14 @@ import java.util.stream.Collectors
 class ShowcaseServiceImpl(val showcaseRepository: ShowcaseRepository, val validationUtil: ValidationUtil) :
     ShowcaseService {
     override fun create(createShowcaseRequest: CreateShowcaseRequest): ShowcaseResponse {
-        validationUtil.validate(createShowcaseRequest)
+//        validationUtil.validate(createShowcaseRequest)
+        val cloudinary = CloudinaryConfig()
+        val uploadResponse = cloudinary.cloudinaryAccount().uploader().upload(createShowcaseRequest.image.bytes, ObjectUtils.asMap())
+
         val showcase = Showcase(
-            id = createShowcaseRequest.id!!,
+            id = null,
             title = createShowcaseRequest.title!!,
-            image = createShowcaseRequest.image!!,
+            image = uploadResponse.get("url").toString(),
             description = createShowcaseRequest.description!!,
             categoryId = createShowcaseRequest.categoryId!!,
             createdAt = Date(),

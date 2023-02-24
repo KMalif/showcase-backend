@@ -3,6 +3,7 @@ package com.plugin.showcaserestfullapi.entity
 import java.util.Date
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.Table
 
@@ -10,7 +11,8 @@ import javax.persistence.Table
 @Table(name = "showcase")
 data class Showcase(
     @Id
-    val id : String,
+    @GeneratedValue
+    val id : Int?,
     @Column(name = "title")
     val title : String,
     @Column(name = "image")
