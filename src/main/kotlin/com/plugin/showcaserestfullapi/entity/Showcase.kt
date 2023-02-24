@@ -12,7 +12,7 @@ import javax.persistence.Table
 data class Showcase(
     @Id
     @GeneratedValue
-    val id : Int?,
+    val id : Int = 0,
     @Column(name = "title")
     val title : String,
     @Column(name = "image")

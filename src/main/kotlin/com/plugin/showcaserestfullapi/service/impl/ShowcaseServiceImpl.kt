@@ -25,7 +25,6 @@ class ShowcaseServiceImpl(val showcaseRepository: ShowcaseRepository, val valida
         val uploadResponse = cloudinary.cloudinaryAccount().uploader().upload(createShowcaseRequest.image.bytes, ObjectUtils.asMap())
 
         val showcase = Showcase(
-            id = null,
             title = createShowcaseRequest.title!!,
             image = uploadResponse.get("url").toString(),
             description = createShowcaseRequest.description!!,
