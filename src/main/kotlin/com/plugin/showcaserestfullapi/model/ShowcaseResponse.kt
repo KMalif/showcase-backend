@@ -7,7 +7,7 @@ data class ShowcaseResponse (
     val title : String,
     val image : String,
     val description : String,
-    val categoryId : String,
+    val categoryName : String,
     val createdAt : Date,
     val updatedAt : Date
 )

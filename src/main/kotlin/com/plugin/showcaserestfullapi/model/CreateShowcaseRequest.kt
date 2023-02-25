@@ -10,6 +10,5 @@ data class CreateShowcaseRequest (
     val image : MultipartFile,
     @field:NotBlank
     val description: String?,
-    @field:NotBlank
-    val categoryId : String?
+    val idCategory : Int
 )
