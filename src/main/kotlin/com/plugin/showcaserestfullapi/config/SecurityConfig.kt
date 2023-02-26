@@ -1,53 +1,49 @@
 package com.plugin.showcaserestfullapi.config
 
-import com.plugin.showcaserestfullapi.service.UserService
-import org.springframework.beans.factory.annotation.Autowired
+import com.plugin.showcaserestfullapi.jwt.JwtAuthenticationFilter
+import com.plugin.showcaserestfullapi.jwt.JwtAuthorizationFilter
+import com.plugin.showcaserestfullapi.jwt.JwtTokenUtil
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-
-
+import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
-@EnableWebSecurity
-class SecurityConfig  : WebSecurityConfigurerAdapter() {
+class SecurityConfig(
+    private val userDetailsService: UserDetailsService
+) {
+    private val jwtToken = JwtTokenUtil()
 
-    @Autowired
-    private val userService : UserService? = null
+    private fun authManager(http: HttpSecurity): AuthenticationManager {
+        val authenticationManagerBuilder = http.getSharedObject(
+            AuthenticationManagerBuilder::class.java
+        )
+        authenticationManagerBuilder.userDetailsService(userDetailsService)
+        return authenticationManagerBuilder.build()
+    }
 
     @Bean
-    fun passwordEncoder(): BCryptPasswordEncoder {
+    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+        val authenticationManager = authManager(http)
+        // Put your endpoint to create/sign, otherwise spring will secure it as
+        // well you won't be able to do any request
+        http.authorizeRequests().antMatchers("/api/**", "/**")
+            .permitAll().anyRequest().authenticated().and().csrf().disable()
+            .authenticationManager(authenticationManager)
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+            .addFilter(JwtAuthenticationFilter(jwtToken, authenticationManager))
+            .addFilter(JwtAuthorizationFilter(jwtToken, userDetailsService, authenticationManager))
+
+        return http.build()
+    }
+
+    @Bean
+    open fun bCryptPasswordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
     }
-
-    @Bean
-    fun authenticationProvider(): DaoAuthenticationProvider {
-        val auth = DaoAuthenticationProvider()
-        auth.setUserDetailsService(userService)
-        auth.setPasswordEncoder(passwordEncoder())
-        return auth
-    }
-
-    @Throws(Exception::class)
-    override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.authenticationProvider(authenticationProvider())
-    }
-
-    @Throws(Exception::class)
-    override fun configure(http: HttpSecurity) {
-        http
-            .authorizeRequests().antMatchers(
-                "/api/register",
-                "/api/showcase",
-                "/api/showcases"
-            ).permitAll()
-        http.authorizeRequests().anyRequest().authenticated()
-
-    }
-
 }

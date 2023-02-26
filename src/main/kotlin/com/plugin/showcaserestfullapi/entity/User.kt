@@ -1,5 +1,7 @@
 package com.plugin.showcaserestfullapi.entity
 
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import java.util.*
 import javax.persistence.*
 
@@ -24,5 +26,4 @@ data class User(
 
     @Column(name = "updated_at")
     var updatedAt : Date
-
-    )
+)
