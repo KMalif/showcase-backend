@@ -1,11 +1,14 @@
 package com.plugin.showcaserestfullapi.service.impl
 
+import com.cloudinary.utils.ObjectUtils
+import com.plugin.showcaserestfullapi.config.CloudinaryConfig
 import com.plugin.showcaserestfullapi.entity.Showcase
 import com.plugin.showcaserestfullapi.helper.NotFoundException
 import com.plugin.showcaserestfullapi.helper.ValidationUtil
 import com.plugin.showcaserestfullapi.model.CreateShowcaseRequest
 import com.plugin.showcaserestfullapi.model.ListShowcaseRequest
 import com.plugin.showcaserestfullapi.model.ShowcaseResponse
+import com.plugin.showcaserestfullapi.repository.CategoryRepository
 import com.plugin.showcaserestfullapi.repository.ShowcaseRepository
 import com.plugin.showcaserestfullapi.service.ShowcaseService
 import org.springframework.data.domain.PageRequest
@@ -15,22 +18,24 @@ import java.util.*
 import java.util.stream.Collectors
 
 @Service
-class ShowcaseServiceImpl(val showcaseRepository: ShowcaseRepository, val validationUtil: ValidationUtil) :
+class ShowcaseServiceImpl(val showcaseRepository: ShowcaseRepository, val categoryRepository: CategoryRepository, val validationUtil: ValidationUtil) :
     ShowcaseService {
     override fun create(createShowcaseRequest: CreateShowcaseRequest): ShowcaseResponse {
-        validationUtil.validate(createShowcaseRequest)
+//        validationUtil.validate(createShowcaseRequest)
+        val kategori = categoryRepository.findCategoryByIdCategory(createShowcaseRequest.idCategory)
+        val cloudinary = CloudinaryConfig()
+        val uploadResponse = cloudinary.cloudinaryAccount().uploader().upload(createShowcaseRequest.image.bytes, ObjectUtils.asMap())
+
         val showcase = Showcase(
-            id = createShowcaseRequest.id!!,
             title = createShowcaseRequest.title!!,
-            image = createShowcaseRequest.image!!,
+            image = uploadResponse.get("url").toString(),
             description = createShowcaseRequest.description!!,
-            categoryId = createShowcaseRequest.categoryId!!,
             createdAt = Date(),
             updatedAt = Date()
         )
+        showcase.category = kategori
         showcaseRepository.save(showcase)
         return convertShowcaseToShowcaseResponse(showcase)
-
     }
 
     override fun get(id: String): ShowcaseResponse {
@@ -58,8 +63,8 @@ class ShowcaseServiceImpl(val showcaseRepository: ShowcaseRepository, val valida
             id = showcase.id,
             title = showcase.title,
             image = showcase.image,
+            categoryName = showcase.category.categoryName,
             description = showcase.description,
-            categoryId = showcase.categoryId,
             createdAt = showcase.createdAt,
             updatedAt = showcase.updatedAt
         )

@@ -6,6 +6,7 @@ import com.plugin.showcaserestfullapi.model.ListShowcaseRequest
 import com.plugin.showcaserestfullapi.model.ShowcaseResponse
 import com.plugin.showcaserestfullapi.service.ShowcaseService
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -14,12 +15,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class ShowcaseController (val showcaseService: ShowcaseService){
-    @PostMapping(
-        value = ["/api/showcase"],
-        produces = ["application/json"],
-        consumes = ["application/json"]
-    )
-    fun createShowcase(@RequestBody createShowcaseRequest: CreateShowcaseRequest) : BaseResponse<ShowcaseResponse> {
+    @PostMapping("/api/showcase")
+    fun createShowcase(@ModelAttribute createShowcaseRequest: CreateShowcaseRequest) : BaseResponse<ShowcaseResponse> {
         val showcaseResponse =  showcaseService.create(createShowcaseRequest)
         return BaseResponse(
             code = 200,
