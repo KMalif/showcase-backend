@@ -1,7 +1,6 @@
 package com.plugin.showcaserestfullapi.jwt
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.plugin.showcaserestfullapi.entity.User
 import com.plugin.showcaserestfullapi.entity.UserSecurity
 import com.plugin.showcaserestfullapi.model.LoginRequest
 import org.springframework.security.authentication.AuthenticationManager
@@ -35,6 +34,10 @@ class JwtAuthenticationFilter(
         val token = jwtTokenUtil.generateToken(username)
         res?.addHeader("Auhtorization", token)
         res?.addHeader("Access-Control-Expose-Headers", "Authorization")
+        res?.contentType = "application/json"
+        val map = mutableMapOf<String, String>()
+        map.put("access_token", token)
+        ObjectMapper().writeValue(res?.outputStream, map)
     }
 
     override fun unsuccessfulAuthentication(
