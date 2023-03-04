@@ -10,5 +10,6 @@ data class CreateShowcaseRequest (
     val image : MultipartFile,
     @field:NotBlank
     val description: String?,
+    @field:NotBlank
     val idCategory : Int
 )

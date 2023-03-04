@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class ShowcaseController (val showcaseService: ShowcaseService){
+
     @PostMapping("/api/showcase")
     fun createShowcase(@ModelAttribute createShowcaseRequest: CreateShowcaseRequest) : BaseResponse<ShowcaseResponse> {
         val showcaseResponse =  showcaseService.create(createShowcaseRequest)
