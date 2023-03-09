@@ -30,7 +30,7 @@ class ShowcaseController (val showcaseService: ShowcaseService){
         value = ["api/showcase/{idShowcase}"],
         produces = ["application/json"]
     )
-    fun getShowcase(@PathVariable("idShowcase") id: String) : BaseResponse<ShowcaseResponse> {
+    fun getShowcase(@PathVariable("idShowcase") id: Int) : BaseResponse<ShowcaseResponse> {
         val showcaseResponse = showcaseService.get(id)
         return BaseResponse(
             code = 200,

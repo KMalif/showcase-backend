@@ -38,7 +38,7 @@ class ShowcaseServiceImpl(val showcaseRepository: ShowcaseRepository, val catego
         return convertShowcaseToShowcaseResponse(showcase)
     }
 
-    override fun get(id: String): ShowcaseResponse {
+    override fun get(id: Int): ShowcaseResponse {
         val showcase = showcaseRepository.findByIdOrNull(id)
         if (showcase === null) {
             throw NotFoundException()
